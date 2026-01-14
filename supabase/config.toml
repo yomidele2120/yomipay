@@ -1,1 +1,16 @@
 project_id = "zjaiylujdtnrfthlqbvb"
+
+[functions.paystack-initialize]
+verify_jwt = false
+
+[functions.paystack-verify]
+verify_jwt = false
+
+[functions.paystack-withdraw]
+verify_jwt = false
+
+[functions.paystack-resolve-account]
+verify_jwt = false
+
+[functions.paystack-webhook]
+verify_jwt = false
