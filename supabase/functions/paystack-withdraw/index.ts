@@ -5,25 +5,43 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
 };
 
 serve(async (req) => {
+  console.log('=== paystack-withdraw: Request received ===');
+  console.log('Method:', req.method);
+
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders, status: 204 });
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     const paystackSecretKey = Deno.env.get('PAYSTACK_SECRET_KEY') || Deno.env.get('LIVE_SECRET_KEY');
 
+    console.log('Environment check:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasSupabaseKey: !!supabaseKey,
+      hasPaystackKey: !!paystackSecretKey,
+    });
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase configuration is missing');
+    }
+
     if (!paystackSecretKey) {
-      throw new Error('Paystack secret key not configured');
+      throw new Error('PAYSTACK_SECRET_KEY is not configured');
     }
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('No authorization header');
+      return new Response(
+        JSON.stringify({ success: false, error: 'No authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -31,17 +49,43 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      throw new Error('Unauthorized');
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    const { amount, bank_account_id, reason } = await req.json();
+    console.log('User authenticated:', user.id);
 
-    if (!amount || amount < 100) {
-      throw new Error('Amount must be at least ₦100');
+    let body;
+    try {
+      body = await req.json();
+      console.log('Request body:', body);
+    } catch {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid request body' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    if (!bank_account_id) {
-      throw new Error('Bank account is required');
+    // Support both bankAccountId and bank_account_id
+    const amount = body.amount;
+    const bankAccountId = body.bankAccountId || body.bank_account_id;
+    const reason = body.reason;
+
+    if (!amount || typeof amount !== 'number' || amount < 100) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Amount must be at least ₦100' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!bankAccountId) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Bank account is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Get user's wallet
@@ -52,27 +96,38 @@ serve(async (req) => {
       .single();
 
     if (walletError || !wallet) {
+      console.error('Wallet error:', walletError);
       throw new Error('Wallet not found');
     }
 
     if (wallet.is_locked) {
-      throw new Error('Wallet is locked. Please contact support.');
+      return new Response(
+        JSON.stringify({ success: false, error: 'Wallet is locked. Please contact support.' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    if (wallet.balance < amount) {
-      throw new Error('Insufficient balance');
+    if ((wallet.balance || 0) < amount) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Insufficient balance' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Get bank account
     const { data: bankAccount, error: bankError } = await supabase
       .from('bank_accounts')
       .select('*')
-      .eq('id', bank_account_id)
+      .eq('id', bankAccountId)
       .eq('user_id', user.id)
       .single();
 
     if (bankError || !bankAccount) {
-      throw new Error('Bank account not found');
+      console.error('Bank account error:', bankError);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Bank account not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Create or get transfer recipient
@@ -99,7 +154,10 @@ serve(async (req) => {
       console.log('Recipient response:', recipientData);
 
       if (!recipientData.status) {
-        throw new Error(recipientData.message || 'Failed to create transfer recipient');
+        return new Response(
+          JSON.stringify({ success: false, error: recipientData.message || 'Failed to create transfer recipient' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
 
       recipientCode = recipientData.data.recipient_code;
@@ -108,10 +166,10 @@ serve(async (req) => {
       await supabase
         .from('bank_accounts')
         .update({ recipient_code: recipientCode })
-        .eq('id', bank_account_id);
+        .eq('id', bankAccountId);
     }
 
-    const reference = `YOMI_WD_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    const reference = `YOMI_WD_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     console.log('Initiating transfer:', { amount, recipientCode, reference });
 
@@ -124,7 +182,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         source: 'balance',
-        amount: amount * 100, // Convert to kobo
+        amount: Math.round(amount * 100), // Convert to kobo
         recipient: recipientCode,
         reason: reason || 'Wallet withdrawal',
         reference,
@@ -135,13 +193,16 @@ serve(async (req) => {
     console.log('Transfer response:', transferData);
 
     if (!transferData.status) {
-      throw new Error(transferData.message || 'Failed to initiate transfer');
+      return new Response(
+        JSON.stringify({ success: false, error: transferData.message || 'Failed to initiate transfer' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Deduct from wallet
     const { error: updateError } = await supabase
       .from('wallets')
-      .update({ balance: wallet.balance - amount })
+      .update({ balance: (wallet.balance || 0) - amount })
       .eq('id', wallet.id);
 
     if (updateError) {
@@ -163,7 +224,7 @@ serve(async (req) => {
         description: `Withdrawal to ${bankAccount.bank_name} - ${bankAccount.account_number}`,
         metadata: { 
           paystack_data: transferData.data,
-          bank_account_id,
+          bank_account_id: bankAccountId,
         }
       });
 
@@ -171,25 +232,30 @@ serve(async (req) => {
       console.error('Error creating transaction:', txError);
     }
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: {
-        reference,
-        status: transferData.data.status,
-        amount,
-      }
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.log('Withdrawal initiated:', reference);
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          reference,
+          status: transferData.data.status,
+          amount,
+        }
+      }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
   } catch (error: unknown) {
-    console.error('Error processing withdrawal:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ 
-      success: false, 
-      error: message 
-    }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error('=== paystack-withdraw: Error ===');
+    console.error('Error details:', error);
+    console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
+    
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+    
+    return new Response(
+      JSON.stringify({ success: false, error: message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });
