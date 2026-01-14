@@ -41,7 +41,7 @@ const Banks = () => {
   const handleAddAccount = () => {
     if (selectedBank && accountNumber.length === 10) {
       addBankAccount.mutate(
-        { bankCode: selectedBank.code, accountNumber },
+        { bankCode: selectedBank.code, bankName: selectedBank.name, accountNumber },
         {
           onSuccess: () => {
             setShowAddDialog(false);

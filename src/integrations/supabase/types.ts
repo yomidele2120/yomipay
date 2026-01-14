@@ -163,6 +163,9 @@ export type Database = {
           is_locked: boolean | null
           updated_at: string | null
           user_id: string
+          virtual_account_name: string | null
+          virtual_account_number: string | null
+          virtual_bank_name: string | null
         }
         Insert: {
           balance?: number | null
@@ -172,6 +175,9 @@ export type Database = {
           is_locked?: boolean | null
           updated_at?: string | null
           user_id: string
+          virtual_account_name?: string | null
+          virtual_account_number?: string | null
+          virtual_bank_name?: string | null
         }
         Update: {
           balance?: number | null
@@ -181,6 +187,9 @@ export type Database = {
           is_locked?: boolean | null
           updated_at?: string | null
           user_id?: string
+          virtual_account_name?: string | null
+          virtual_account_number?: string | null
+          virtual_bank_name?: string | null
         }
         Relationships: [
           {
