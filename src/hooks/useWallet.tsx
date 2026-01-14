@@ -9,6 +9,9 @@ interface Wallet {
   balance: number;
   currency: string;
   is_locked: boolean;
+  virtual_account_number: string | null;
+  virtual_bank_name: string | null;
+  virtual_account_name: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -47,7 +50,7 @@ export const useWallet = () => {
   const queryClient = useQueryClient();
 
   // Fetch wallet
-  const { data: wallet, isLoading: walletLoading } = useQuery({
+  const { data: wallet, isLoading: walletLoading, refetch: refetchWallet } = useQuery({
     queryKey: ["wallet", user?.id],
     queryFn: async (): Promise<Wallet | null> => {
       if (!user?.id) return null;
@@ -59,7 +62,7 @@ export const useWallet = () => {
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      return data as Wallet | null;
     },
     enabled: !!user?.id,
   });
@@ -105,15 +108,16 @@ export const useWallet = () => {
   const initializePayment = useMutation({
     mutationFn: async (amount: number) => {
       const { data, error } = await supabase.functions.invoke("paystack-initialize", {
-        body: { amount },
+        body: { amount, email: user?.email },
       });
 
       if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Failed to initialize payment");
       return data;
     },
     onSuccess: (data) => {
-      if (data.authorization_url) {
-        window.location.href = data.authorization_url;
+      if (data?.data?.authorization_url) {
+        window.location.href = data.data.authorization_url;
       }
     },
     onError: (error: Error) => {
@@ -133,6 +137,7 @@ export const useWallet = () => {
       });
 
       if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Failed to verify payment");
       return data;
     },
     onSuccess: () => {
@@ -141,6 +146,13 @@ export const useWallet = () => {
       toast({
         title: "Payment Successful! 🎉",
         description: "Your wallet has been funded.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Verification Error",
+        description: error.message || "Failed to verify payment",
       });
     },
   });
@@ -153,6 +165,7 @@ export const useWallet = () => {
       });
 
       if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Failed to process withdrawal");
       return data;
     },
     onSuccess: () => {
@@ -174,12 +187,13 @@ export const useWallet = () => {
 
   // Add bank account
   const addBankAccount = useMutation({
-    mutationFn: async ({ bankCode, accountNumber }: { bankCode: string; accountNumber: string }) => {
+    mutationFn: async ({ bankCode, bankName, accountNumber }: { bankCode: string; bankName: string; accountNumber: string }) => {
       const { data, error } = await supabase.functions.invoke("paystack-resolve-account", {
-        body: { bankCode, accountNumber },
+        body: { bankCode, bankName, accountNumber },
       });
 
       if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Failed to verify bank account");
       return data;
     },
     onSuccess: () => {
@@ -215,11 +229,44 @@ export const useWallet = () => {
         description: "The bank account has been removed.",
       });
     },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to delete bank account",
+      });
+    },
+  });
+
+  // Create Dedicated Virtual Account
+  const createVirtualAccount = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("paystack-create-dva", {});
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Failed to create virtual account");
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wallet"] });
+      toast({
+        title: "Virtual Account Created! 🏦",
+        description: "You can now receive funds via bank transfer.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to create virtual account",
+      });
+    },
   });
 
   return {
     wallet,
     walletLoading,
+    refetchWallet,
     transactions,
     transactionsLoading,
     bankAccounts,
@@ -229,5 +276,6 @@ export const useWallet = () => {
     withdrawFunds,
     addBankAccount,
     deleteBankAccount,
+    createVirtualAccount,
   };
 };
