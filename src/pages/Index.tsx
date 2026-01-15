@@ -8,13 +8,14 @@ import { TransactionItem } from "@/components/TransactionItem";
 import { BottomNav } from "@/components/BottomNav";
 import { FullPageLoader } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, TrendingUp } from "lucide-react";
+import { ArrowRight, Shield, TrendingUp, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
-  const { wallet, walletLoading, transactions, verifyPayment } = useWallet();
+  const { wallet, walletLoading, transactions, verifyPayment, refetchWallet } = useWallet();
 
   // Handle Paystack callback
   useEffect(() => {
@@ -53,6 +54,12 @@ const Index = () => {
             </h1>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => refetchWallet()}
+              className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors"
+            >
+              <RefreshCw className={cn("w-5 h-5", walletLoading && "animate-spin")} />
+            </button>
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-primary font-bold text-lg">
                 {(user.user_metadata?.full_name || user.email || "U")[0].toUpperCase()}
@@ -61,7 +68,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Wallet Card */}
+        {/* Wallet Card with Virtual Account */}
         <WalletCard
           balance={wallet?.balance || 0}
           currency={wallet?.currency || "NGN"}

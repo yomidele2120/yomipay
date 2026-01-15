@@ -1,4 +1,4 @@
-import { Plus, ArrowUpRight, History, CreditCard } from "lucide-react";
+import { Plus, ArrowUpRight, History, CreditCard, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const QuickActions = () => {
@@ -7,7 +7,7 @@ export const QuickActions = () => {
   const actions = [
     {
       icon: Plus,
-      label: "Fund Wallet",
+      label: "Fund",
       description: "Add money",
       onClick: () => navigate("/fund"),
       gradient: "from-emerald-500 to-teal-600",
@@ -20,18 +20,18 @@ export const QuickActions = () => {
       gradient: "from-blue-500 to-indigo-600",
     },
     {
-      icon: History,
-      label: "History",
-      description: "Transactions",
-      onClick: () => navigate("/transactions"),
-      gradient: "from-purple-500 to-pink-600",
-    },
-    {
-      icon: CreditCard,
+      icon: Building2,
       label: "Banks",
       description: "Manage",
       onClick: () => navigate("/banks"),
       gradient: "from-orange-500 to-red-600",
+    },
+    {
+      icon: History,
+      label: "History",
+      description: "View all",
+      onClick: () => navigate("/transactions"),
+      gradient: "from-purple-500 to-pink-600",
     },
   ];
 
