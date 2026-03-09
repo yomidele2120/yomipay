@@ -136,6 +136,7 @@ const Index = () => {
                     description={tx.description}
                     createdAt={tx.created_at}
                     reference={tx.reference}
+                    source={tx.source}
                   />
                 </div>
               ))}
