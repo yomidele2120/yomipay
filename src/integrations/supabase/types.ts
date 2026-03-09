@@ -70,6 +70,8 @@ export type Database = {
           kyc_data: Json | null
           kyc_level: Database["public"]["Enums"]["kyc_level"] | null
           phone: string | null
+          pin_set_at: string | null
+          transaction_pin_hash: string | null
           updated_at: string | null
         }
         Insert: {
@@ -80,6 +82,8 @@ export type Database = {
           kyc_data?: Json | null
           kyc_level?: Database["public"]["Enums"]["kyc_level"] | null
           phone?: string | null
+          pin_set_at?: string | null
+          transaction_pin_hash?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -90,6 +94,8 @@ export type Database = {
           kyc_data?: Json | null
           kyc_level?: Database["public"]["Enums"]["kyc_level"] | null
           phone?: string | null
+          pin_set_at?: string | null
+          transaction_pin_hash?: string | null
           updated_at?: string | null
         }
         Relationships: []
