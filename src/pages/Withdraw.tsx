@@ -1,20 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWallet } from "@/hooks/useWallet";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BottomNav } from "@/components/BottomNav";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { PinSetupDialog } from "@/components/PinSetupDialog";
+import { PinVerifyDialog } from "@/components/PinVerifyDialog";
+import { TransactionReceipt } from "@/components/TransactionReceipt";
 import { ArrowLeft, ArrowUpRight, Building2, AlertCircle, Plus } from "lucide-react";
 import { formatCurrency, MIN_WITHDRAWAL, WITHDRAWAL_FEE_PERCENT, WITHDRAWAL_FEE_CAP } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const Withdraw = () => {
   const navigate = useNavigate();
   const { wallet, bankAccounts, withdrawFunds } = useWallet();
   const [amount, setAmount] = useState("");
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
+  const [hasPin, setHasPin] = useState<boolean | null>(null);
+  const [showPinSetup, setShowPinSetup] = useState(false);
+  const [showPinVerify, setShowPinVerify] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [lastTransaction, setLastTransaction] = useState<any>(null);
+
+  // Check if user has PIN set
+  useEffect(() => {
+    const checkPin = async () => {
+      try {
+        const { data } = await supabase.functions.invoke("manage-pin", {
+          body: { action: "check" },
+        });
+        setHasPin(data?.hasPin || false);
+      } catch {
+        setHasPin(false);
+      }
+    };
+    checkPin();
+  }, []);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
@@ -32,9 +57,45 @@ const Withdraw = () => {
     selectedBank !== null;
 
   const handleSubmit = () => {
-    if (isValid && selectedBank) {
-      withdrawFunds.mutate({ amount: numAmount, bankAccountId: selectedBank });
+    if (!isValid || !selectedBank) return;
+
+    if (!hasPin) {
+      setShowPinSetup(true);
+      return;
     }
+
+    setShowPinVerify(true);
+  };
+
+  const handlePinVerified = () => {
+    if (selectedBank) {
+      withdrawFunds.mutate(
+        { amount: numAmount, bankAccountId: selectedBank },
+        {
+          onSuccess: () => {
+            const selectedBankAccount = bankAccounts.find((a) => a.id === selectedBank);
+            setLastTransaction({
+              type: "debit",
+              amount: numAmount,
+              status: "pending",
+              description: `Withdrawal to ${selectedBankAccount?.bank_name || "bank"}`,
+              reference: `WD_${Date.now().toString(36).toUpperCase()}`,
+              createdAt: new Date().toISOString(),
+              source: "paystack",
+            });
+            setShowReceipt(true);
+            setAmount("");
+            setSelectedBank(null);
+          },
+        }
+      );
+    }
+  };
+
+  const handlePinSetupSuccess = () => {
+    setHasPin(true);
+    // After setting up PIN, proceed to verify
+    setShowPinVerify(true);
   };
 
   return (
@@ -206,6 +267,27 @@ const Withdraw = () => {
       </div>
 
       <BottomNav />
+
+      {/* PIN Setup Dialog */}
+      <PinSetupDialog
+        open={showPinSetup}
+        onOpenChange={setShowPinSetup}
+        onSuccess={handlePinSetupSuccess}
+      />
+
+      {/* PIN Verify Dialog */}
+      <PinVerifyDialog
+        open={showPinVerify}
+        onOpenChange={setShowPinVerify}
+        onVerified={handlePinVerified}
+      />
+
+      {/* Transaction Receipt */}
+      <TransactionReceipt
+        open={showReceipt}
+        onOpenChange={setShowReceipt}
+        transaction={lastTransaction}
+      />
     </div>
   );
 };
