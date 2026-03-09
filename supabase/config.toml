@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.paystack-create-dva]
 verify_jwt = false
+
+[functions.manage-pin]
+verify_jwt = false

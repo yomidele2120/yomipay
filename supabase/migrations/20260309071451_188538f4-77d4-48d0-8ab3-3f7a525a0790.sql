@@ -1,0 +1,4 @@
+
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS transaction_pin_hash TEXT,
+ADD COLUMN IF NOT EXISTS pin_set_at TIMESTAMP WITH TIME ZONE;
