@@ -123,31 +123,7 @@ export const WalletCard = ({ balance, currency = "NGN", className }: WalletCardP
             </button>
           </div>
         </div>
-      ) : (
-        <div className="bg-card rounded-2xl p-4 border border-border animate-fade-in">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-              <Building2 className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-foreground">Get Your Account Number</p>
-              <p className="text-xs text-muted-foreground">Receive funds via bank transfer</p>
-            </div>
-            <Button
-              variant="gradient"
-              size="sm"
-              onClick={() => createVirtualAccount.mutate()}
-              disabled={createVirtualAccount.isPending}
-            >
-              {createVirtualAccount.isPending ? (
-                <LoadingSpinner size="sm" />
-              ) : (
-                "Create"
-              )}
-            </Button>
-          </div>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 };
