@@ -2,37 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-/* YOMI PAY Design System - Bold Fintech Theme */
+/* YOMI PAY Design System - Dark Fintech Theme */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Primary - Vibrant Emerald Green */
+    /* Primary - YOMI PAY Green */
     --primary: 155 84% 35%;
     --primary-foreground: 0 0% 100%;
     
-    /* Secondary - Deep Navy */
-    --secondary: 220 60% 15%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary */
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 90%;
     
-    /* Background - Soft Cream */
-    --background: 40 20% 98%;
-    --foreground: 220 40% 10%;
+    /* Background - Near Black */
+    --background: 0 0% 7%;
+    --foreground: 0 0% 95%;
     
-    /* Card - White with subtle warmth */
-    --card: 0 0% 100%;
-    --card-foreground: 220 40% 10%;
+    /* Card - Dark elevated surface */
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 95%;
     
     /* Muted */
-    --muted: 40 10% 94%;
-    --muted-foreground: 220 15% 45%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 55%;
     
-    /* Accent - Gold */
-    --accent: 45 100% 50%;
-    --accent-foreground: 220 40% 10%;
+    /* Accent */
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 95%;
     
-    /* Success */
+    /* Success - Green */
     --success: 155 84% 35%;
     --success-foreground: 0 0% 100%;
     
@@ -40,80 +40,41 @@
     --warning: 25 95% 53%;
     --warning-foreground: 0 0% 100%;
     
-    /* Destructive */
-    --destructive: 0 84% 60%;
+    /* Destructive - Red */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     
     /* Borders */
-    --border: 40 15% 90%;
-    --input: 40 15% 90%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
     --ring: 155 84% 35%;
     
     /* Popover */
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 40% 10%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 95%;
     
     --radius: 1rem;
     
     /* Custom Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(155, 84%, 35%) 0%, hsl(165, 80%, 28%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(155, 84%, 40%) 0%, hsl(160, 75%, 30%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(45, 100%, 50%) 0%, hsl(35, 95%, 55%) 100%);
-    --gradient-dark: linear-gradient(135deg, hsl(220, 60%, 15%) 0%, hsl(220, 50%, 8%) 100%);
+    --gradient-surface: linear-gradient(180deg, hsl(0, 0%, 13%) 0%, hsl(0, 0%, 9%) 100%);
+    --gradient-dark: linear-gradient(135deg, hsl(0, 0%, 14%) 0%, hsl(0, 0%, 8%) 100%);
     
     /* Shadows */
-    --shadow-card: 0 4px 24px -4px hsla(155, 84%, 35%, 0.15);
-    --shadow-button: 0 4px 16px -4px hsla(155, 84%, 35%, 0.4);
-    --shadow-elevated: 0 12px 40px -8px hsla(220, 60%, 15%, 0.2);
+    --shadow-card: 0 4px 24px -4px hsla(0, 0%, 0%, 0.4);
+    --shadow-button: 0 4px 16px -4px hsla(155, 84%, 35%, 0.3);
+    --shadow-elevated: 0 12px 40px -8px hsla(0, 0%, 0%, 0.5);
     
     /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 40% 10%;
+    --sidebar-background: 0 0% 11%;
+    --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 155 84% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 10% 94%;
-    --sidebar-accent-foreground: 220 40% 10%;
-    --sidebar-border: 40 15% 90%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 16%;
     --sidebar-ring: 155 84% 35%;
-  }
-
-  .dark {
-    --primary: 155 75% 45%;
-    --primary-foreground: 0 0% 100%;
-    
-    --secondary: 220 40% 25%;
-    --secondary-foreground: 0 0% 100%;
-    
-    --background: 220 40% 6%;
-    --foreground: 40 20% 95%;
-    
-    --card: 220 35% 10%;
-    --card-foreground: 40 20% 95%;
-    
-    --muted: 220 30% 15%;
-    --muted-foreground: 40 10% 60%;
-    
-    --accent: 45 100% 50%;
-    --accent-foreground: 220 40% 10%;
-    
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 100%;
-    
-    --border: 220 30% 18%;
-    --input: 220 30% 18%;
-    --ring: 155 75% 45%;
-    
-    --popover: 220 35% 10%;
-    --popover-foreground: 40 20% 95%;
-    
-    --sidebar-background: 220 35% 10%;
-    --sidebar-foreground: 40 20% 95%;
-    --sidebar-primary: 155 75% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 30% 15%;
-    --sidebar-accent-foreground: 40 20% 95%;
-    --sidebar-border: 220 30% 18%;
-    --sidebar-ring: 155 75% 45%;
   }
 }
 
@@ -123,7 +84,7 @@
   }
 
   html {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   body {
@@ -132,22 +93,22 @@
 }
 
 @layer components {
-  /* Wallet Card Gradient */
+  /* Wallet Card */
   .wallet-card {
-    background: var(--gradient-card);
-    @apply rounded-3xl p-6 text-white shadow-xl relative overflow-hidden;
+    background: var(--gradient-surface);
+    @apply rounded-2xl p-6 relative overflow-hidden border border-border;
   }
   
   .wallet-card::before {
     content: '';
-    @apply absolute inset-0 opacity-30;
-    background: radial-gradient(circle at 80% 20%, hsla(0, 0%, 100%, 0.3), transparent 50%);
+    @apply absolute inset-0 opacity-10;
+    background: radial-gradient(circle at 80% 20%, hsla(0, 0%, 100%, 0.15), transparent 50%);
   }
   
   .wallet-card::after {
     content: '';
-    @apply absolute -right-12 -bottom-12 w-48 h-48 rounded-full opacity-20;
-    background: hsla(0, 0%, 100%, 0.2);
+    @apply absolute -right-12 -bottom-12 w-48 h-48 rounded-full opacity-5;
+    background: hsla(0, 0%, 100%, 0.1);
   }
   
   /* Button Primary Gradient */
@@ -158,8 +119,7 @@
   }
   
   .btn-primary-gradient:hover {
-    @apply transform scale-[1.02];
-    box-shadow: 0 6px 24px -4px hsla(155, 84%, 35%, 0.5);
+    @apply transform scale-[1.02] brightness-110;
   }
   
   /* Quick Action Buttons */
@@ -168,8 +128,8 @@
   }
   
   .quick-action:hover {
-    @apply border-primary/30 bg-primary/5;
-    box-shadow: var(--shadow-card);
+    @apply border-primary/30;
+    background: hsl(0 0% 14%);
   }
   
   .quick-action-icon {
@@ -185,29 +145,19 @@
   
   .transaction-item:hover {
     @apply border-border;
-    box-shadow: var(--shadow-card);
+    background: hsl(0 0% 13%);
   }
   
   /* Input Fields */
   .input-yomi {
-    @apply w-full px-4 py-3.5 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground transition-all duration-200;
+    @apply w-full px-4 py-3.5 rounded-xl border border-border bg-muted text-foreground placeholder:text-muted-foreground transition-all duration-200;
   }
   
   .input-yomi:focus {
     @apply outline-none border-primary ring-2 ring-primary/20;
   }
   
-  /* Glass Effect */
-  .glass {
-    @apply bg-white/80 backdrop-blur-lg;
-  }
-  
-  /* Floating Label */
-  .floating-label {
-    @apply absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none transition-all duration-200;
-  }
-  
-  /* Success Badge */
+  /* Badges */
   .badge-success {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success;
   }
@@ -222,7 +172,7 @@
   
   /* Bottom Nav */
   .bottom-nav {
-    @apply fixed bottom-0 left-0 right-0 bg-card border-t border-border;
+    @apply fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border;
     padding-bottom: env(safe-area-inset-bottom);
   }
   
@@ -246,51 +196,33 @@
 }
 
 @layer utilities {
-  /* Animate Pulse Subtle */
   .animate-pulse-subtle {
     animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
   
   @keyframes pulse-subtle {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.85;
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
   }
   
-  /* Slide Up */
   .animate-slide-up {
     animation: slide-up 0.3s ease-out forwards;
   }
   
   @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   
-  /* Fade In */
   .animate-fade-in {
     animation: fade-in 0.3s ease-out forwards;
   }
   
   @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
-  /* Number Font */
   .font-number {
     font-variant-numeric: tabular-nums;
   }

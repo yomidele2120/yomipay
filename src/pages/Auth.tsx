@@ -27,40 +27,14 @@ const Auth = () => {
   });
 
   useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
+    if (user) navigate("/");
   }, [user, navigate]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-
-    try {
-      emailSchema.parse(formData.email);
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        newErrors.email = e.errors[0].message;
-      }
-    }
-
-    try {
-      passwordSchema.parse(formData.password);
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        newErrors.password = e.errors[0].message;
-      }
-    }
-
-    if (!isLogin) {
-      try {
-        nameSchema.parse(formData.fullName);
-      } catch (e) {
-        if (e instanceof z.ZodError) {
-          newErrors.fullName = e.errors[0].message;
-        }
-      }
-    }
-
+    try { emailSchema.parse(formData.email); } catch (e) { if (e instanceof z.ZodError) newErrors.email = e.errors[0].message; }
+    try { passwordSchema.parse(formData.password); } catch (e) { if (e instanceof z.ZodError) newErrors.password = e.errors[0].message; }
+    if (!isLogin) { try { nameSchema.parse(formData.fullName); } catch (e) { if (e instanceof z.ZodError) newErrors.fullName = e.errors[0].message; } }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -68,119 +42,77 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-
     setLoading(true);
     setErrors({});
-
     try {
       if (isLogin) {
         const { error } = await signIn(formData.email, formData.password);
-        if (error) {
-          setErrors({ submit: error.message });
-        }
+        if (error) setErrors({ submit: error.message });
       } else {
         const { error } = await signUp(formData.email, formData.password, formData.fullName);
-        if (error) {
-          setErrors({ submit: error.message });
-        }
+        if (error) setErrors({ submit: error.message });
       }
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
         {/* Logo */}
         <div className="text-center mb-10 animate-fade-in">
-          <h1 className="text-4xl font-bold mb-2">
+          <h1 className="text-4xl font-bold font-display mb-2">
             <span className="text-primary">YOMI</span>
-            <span className="text-foreground/80 font-light"> PAY</span>
+            <span className="text-foreground/60 font-light"> PAY</span>
           </h1>
-          <p className="text-muted-foreground">Your money, your control</p>
+          <p className="text-muted-foreground text-sm">Your money, your control</p>
         </div>
 
-        {/* Form Card */}
+        {/* Form */}
         <div className="w-full max-w-sm mx-auto animate-slide-up">
-          <div className="bg-card rounded-3xl p-6 shadow-elevated border border-border">
-            <h2 className="text-2xl font-bold text-center mb-6">
+          <div className="bg-card rounded-2xl p-6 border border-border">
+            <h2 className="text-xl font-bold text-center mb-6 font-display">
               {isLogin ? "Welcome Back" : "Create Account"}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="fullName" className="text-muted-foreground text-sm">Full Name</Label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="John Doe"
-                      value={formData.fullName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, fullName: e.target.value })
-                      }
-                      className="input-yomi pl-12"
-                    />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input id="fullName" type="text" placeholder="John Doe" value={formData.fullName}
+                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                      className="input-yomi pl-10" />
                   </div>
-                  {errors.fullName && (
-                    <p className="text-sm text-destructive">{errors.fullName}</p>
-                  )}
+                  {errors.fullName && <p className="text-sm text-destructive">{errors.fullName}</p>}
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email" className="text-muted-foreground text-sm">Email Address</Label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className="input-yomi pl-12"
-                  />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input id="email" type="email" placeholder="you@example.com" value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="input-yomi pl-10" />
                 </div>
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
-                )}
+                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-muted-foreground text-sm">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••"
                     value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    className="input-yomi pl-12 pr-12"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="input-yomi pl-10 pr-10" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
-                )}
+                {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
               </div>
 
               {errors.submit && (
@@ -189,42 +121,18 @@ const Auth = () => {
                 </div>
               )}
 
-              <Button
-                type="submit"
-                className="w-full"
-                variant="gradient"
-                size="lg"
-                disabled={loading}
-              >
-                {loading ? (
-                  <LoadingSpinner size="sm" />
-                ) : isLogin ? (
-                  "Sign In"
-                ) : (
-                  "Create Account"
-                )}
+              <Button type="submit" className="w-full" variant="gradient" size="lg" disabled={loading}>
+                {loading ? <LoadingSpinner size="sm" /> : isLogin ? "Sign In" : "Create Account"}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setErrors({});
-                }}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
+              <button type="button" onClick={() => { setIsLogin(!isLogin); setErrors({}); }}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 {isLogin ? (
-                  <>
-                    Don't have an account?{" "}
-                    <span className="font-semibold text-primary">Sign Up</span>
-                  </>
+                  <>Don't have an account? <span className="font-semibold text-primary">Sign Up</span></>
                 ) : (
-                  <>
-                    Already have an account?{" "}
-                    <span className="font-semibold text-primary">Sign In</span>
-                  </>
+                  <>Already have an account? <span className="font-semibold text-primary">Sign In</span></>
                 )}
               </button>
             </div>
@@ -232,7 +140,6 @@ const Auth = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <div className="px-6 py-8 text-center">
         <p className="text-xs text-muted-foreground">
           By continuing, you agree to our Terms of Service and Privacy Policy
