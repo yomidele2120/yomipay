@@ -27,8 +27,8 @@ export const FullPageLoader = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background">
       <div className="mb-4">
-        <span className="text-2xl font-bold text-primary tracking-tight">YOMI</span>
-        <span className="text-2xl font-light text-muted-foreground tracking-tight"> PAY</span>
+        <span className="text-2xl font-bold text-primary tracking-tight font-display">YOMI</span>
+        <span className="text-2xl font-light text-muted-foreground tracking-tight font-display"> PAY</span>
       </div>
       <LoadingSpinner size="lg" />
     </div>
