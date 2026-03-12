@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import "./index.css";
 
+type RuntimeEnv = Record<string, string | boolean | undefined>;
+
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {
@@ -28,17 +30,29 @@ const renderBootFallback = (message: string) => {
   );
 };
 
+const ensureRuntimeEnv = () => {
+  const runtimeEnv = import.meta.env as RuntimeEnv;
+
+  if (!runtimeEnv.VITE_SUPABASE_URL && runtimeEnv.VITE_SUPABASE_PROJECT_ID) {
+    runtimeEnv.VITE_SUPABASE_URL = `https://${runtimeEnv.VITE_SUPABASE_PROJECT_ID}.supabase.co`;
+  }
+
+  if (!runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY && runtimeEnv.VITE_SUPABASE_ANON_KEY) {
+    runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY = String(runtimeEnv.VITE_SUPABASE_ANON_KEY);
+  }
+
+  const missing = ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"].filter(
+    (key) => !runtimeEnv[key]
+  );
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required configuration: ${missing.join(", ")}`);
+  }
+};
+
 const bootstrap = async () => {
   try {
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-    if (!url || !key) {
-      const missing = [];
-      if (!url) missing.push("VITE_SUPABASE_URL");
-      if (!key) missing.push("VITE_SUPABASE_PUBLISHABLE_KEY");
-      throw new Error(`Missing required configuration: ${missing.join(", ")}`);
-    }
+    ensureRuntimeEnv();
 
     const [{ default: App }, { RootErrorBoundary }] = await Promise.all([
       import("./App.tsx"),
