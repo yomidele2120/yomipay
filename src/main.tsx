@@ -4,6 +4,13 @@ import "./index.css";
 
 type RuntimeEnv = Record<string, string | boolean | undefined>;
 
+const injectedEnv = {
+  supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+  supabaseProjectId: import.meta.env.VITE_SUPABASE_PROJECT_ID,
+  supabasePublishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+};
+
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {
@@ -32,6 +39,22 @@ const renderBootFallback = (message: string) => {
 
 const ensureRuntimeEnv = () => {
   const runtimeEnv = import.meta.env as RuntimeEnv;
+
+  if (!runtimeEnv.VITE_SUPABASE_URL && injectedEnv.supabaseUrl) {
+    runtimeEnv.VITE_SUPABASE_URL = String(injectedEnv.supabaseUrl);
+  }
+
+  if (!runtimeEnv.VITE_SUPABASE_PROJECT_ID && injectedEnv.supabaseProjectId) {
+    runtimeEnv.VITE_SUPABASE_PROJECT_ID = String(injectedEnv.supabaseProjectId);
+  }
+
+  if (!runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY && injectedEnv.supabasePublishableKey) {
+    runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY = String(injectedEnv.supabasePublishableKey);
+  }
+
+  if (!runtimeEnv.VITE_SUPABASE_ANON_KEY && injectedEnv.supabaseAnonKey) {
+    runtimeEnv.VITE_SUPABASE_ANON_KEY = String(injectedEnv.supabaseAnonKey);
+  }
 
   if (!runtimeEnv.VITE_SUPABASE_URL && runtimeEnv.VITE_SUPABASE_PROJECT_ID) {
     runtimeEnv.VITE_SUPABASE_URL = `https://${runtimeEnv.VITE_SUPABASE_PROJECT_ID}.supabase.co`;
