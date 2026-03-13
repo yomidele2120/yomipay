@@ -212,7 +212,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      complete_transaction: {
+        Args: { p_metadata?: Json; p_reference: string }
+        Returns: undefined
+      }
+      deduct_wallet_balance: {
+        Args: {
+          p_amount: number
+          p_description: string
+          p_reference: string
+          p_source?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      refund_wallet_balance: {
+        Args: { p_amount: number; p_reference: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       kyc_level: "unverified" | "basic" | "verified" | "premium"

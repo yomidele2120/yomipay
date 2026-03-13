@@ -1,4 +1,4 @@
-import { Plus, ArrowUpRight, History, Building2 } from "lucide-react";
+import { Plus, ArrowUpRight, Phone, Wifi, Zap, Tv, History, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const QuickActions = () => {
@@ -7,6 +7,10 @@ export const QuickActions = () => {
   const actions = [
     { icon: Plus, label: "Fund", description: "Add money", onClick: () => navigate("/fund") },
     { icon: ArrowUpRight, label: "Withdraw", description: "To bank", onClick: () => navigate("/withdraw") },
+    { icon: Phone, label: "Airtime", description: "Buy now", onClick: () => navigate("/buy-airtime") },
+    { icon: Wifi, label: "Data", description: "Buy now", onClick: () => navigate("/buy-data") },
+    { icon: Zap, label: "Power", description: "Pay bills", onClick: () => navigate("/buy-electricity") },
+    { icon: Tv, label: "Cable TV", description: "Subscribe", onClick: () => navigate("/buy-cable") },
     { icon: Building2, label: "Banks", description: "Manage", onClick: () => navigate("/banks") },
     { icon: History, label: "History", description: "View all", onClick: () => navigate("/transactions") },
   ];

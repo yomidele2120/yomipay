@@ -1,4 +1,4 @@
-import { Home, Wallet, History, User, ArrowLeftRight } from "lucide-react";
+import { Home, Wallet, History, User, Zap } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,7 @@ export const BottomNav = () => {
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
     { icon: Wallet, label: "Wallet", path: "/fund" },
-    { icon: ArrowLeftRight, label: "", path: "/withdraw", isCenter: true },
+    { icon: Zap, label: "", path: "/services", isCenter: true },
     { icon: History, label: "History", path: "/transactions" },
     { icon: User, label: "Profile", path: "/profile" },
   ];
