@@ -51,11 +51,11 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
-      "import.meta.env.VITE_SUPABASE_PROJECT_ID": JSON.stringify(projectId),
-      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(publishableKey),
-      "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(publishableKey),
-      "import.meta.env.VITE_PAYSTACK_PUBLIC_KEY": JSON.stringify(paystackPublicKey),
+      ...(supabaseUrl ? { "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl) } : {}),
+      ...(projectId ? { "import.meta.env.VITE_SUPABASE_PROJECT_ID": JSON.stringify(projectId) } : {}),
+      ...(publishableKey ? { "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(publishableKey) } : {}),
+      ...(publishableKey ? { "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(publishableKey) } : {}),
+      ...(paystackPublicKey ? { "import.meta.env.VITE_PAYSTACK_PUBLIC_KEY": JSON.stringify(paystackPublicKey) } : {}),
     },
   };
 });
