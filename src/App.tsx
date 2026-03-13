@@ -11,6 +11,11 @@ import Withdraw from "./pages/Withdraw";
 import Transactions from "./pages/Transactions";
 import Banks from "./pages/Banks";
 import Profile from "./pages/Profile";
+import Services from "./pages/Services";
+import BuyAirtime from "./pages/BuyAirtime";
+import BuyData from "./pages/BuyData";
+import BuyElectricity from "./pages/BuyElectricity";
+import BuyCable from "./pages/BuyCable";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +35,11 @@ const App = () => (
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/banks" element={<Banks />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/buy-airtime" element={<BuyAirtime />} />
+            <Route path="/buy-data" element={<BuyData />} />
+            <Route path="/buy-electricity" element={<BuyElectricity />} />
+            <Route path="/buy-cable" element={<BuyCable />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
