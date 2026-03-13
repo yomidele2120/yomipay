@@ -37,39 +37,47 @@ const renderBootFallback = (message: string) => {
   );
 };
 
+const FALLBACK_PROJECT_ID = "zjaiylujdtnrfthlqbvb";
+const FALLBACK_URL = `https://${FALLBACK_PROJECT_ID}.supabase.co`;
+const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqYWl5bHVqZHRucmZ0aGxxYnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMDkwNzcsImV4cCI6MjA4Mzg4NTA3N30.H3raNxAJVOTr3tSOUz_LYk3Y9SQo1HvrrqXKY9MlJeg";
+
 const ensureRuntimeEnv = () => {
   const runtimeEnv = import.meta.env as RuntimeEnv;
 
+  // Apply injected values first
   if (!runtimeEnv.VITE_SUPABASE_URL && injectedEnv.supabaseUrl) {
     runtimeEnv.VITE_SUPABASE_URL = String(injectedEnv.supabaseUrl);
   }
-
   if (!runtimeEnv.VITE_SUPABASE_PROJECT_ID && injectedEnv.supabaseProjectId) {
     runtimeEnv.VITE_SUPABASE_PROJECT_ID = String(injectedEnv.supabaseProjectId);
   }
-
   if (!runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY && injectedEnv.supabasePublishableKey) {
     runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY = String(injectedEnv.supabasePublishableKey);
   }
-
   if (!runtimeEnv.VITE_SUPABASE_ANON_KEY && injectedEnv.supabaseAnonKey) {
     runtimeEnv.VITE_SUPABASE_ANON_KEY = String(injectedEnv.supabaseAnonKey);
   }
 
+  // Derive from project ID
   if (!runtimeEnv.VITE_SUPABASE_URL && runtimeEnv.VITE_SUPABASE_PROJECT_ID) {
     runtimeEnv.VITE_SUPABASE_URL = `https://${runtimeEnv.VITE_SUPABASE_PROJECT_ID}.supabase.co`;
   }
-
   if (!runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY && runtimeEnv.VITE_SUPABASE_ANON_KEY) {
     runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY = String(runtimeEnv.VITE_SUPABASE_ANON_KEY);
   }
 
-  const missing = ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"].filter(
-    (key) => !runtimeEnv[key]
-  );
-
-  if (missing.length > 0) {
-    throw new Error(`Missing required configuration: ${missing.join(", ")}`);
+  // Hardcoded fallbacks — these are public anon keys, safe to embed
+  if (!runtimeEnv.VITE_SUPABASE_URL) {
+    runtimeEnv.VITE_SUPABASE_URL = FALLBACK_URL;
+  }
+  if (!runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY) {
+    runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY = FALLBACK_KEY;
+  }
+  if (!runtimeEnv.VITE_SUPABASE_ANON_KEY) {
+    runtimeEnv.VITE_SUPABASE_ANON_KEY = FALLBACK_KEY;
+  }
+  if (!runtimeEnv.VITE_SUPABASE_PROJECT_ID) {
+    runtimeEnv.VITE_SUPABASE_PROJECT_ID = FALLBACK_PROJECT_ID;
   }
 };
 
